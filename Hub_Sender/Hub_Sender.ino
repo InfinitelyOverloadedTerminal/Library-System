@@ -1,5 +1,4 @@
-#include <esp_now.h> //Needed for ESPNow
-#include <WiFi.h> //Needed for ESPNow
+#include <WiFi.h> //Needed for wireless transmitting
 
 void setup() {
   // put your setup code here, to run once:
