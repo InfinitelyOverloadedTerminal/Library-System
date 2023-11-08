@@ -44,6 +44,9 @@ char occupants[tableCapacity][9];
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   Serial.print("Last Packet Send Status: ");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+  if (status != 0){
+    delay(100);
+  }
 }
 
 // Callback when data is received
@@ -175,11 +178,11 @@ void loop() {
     lcd.setCursor(0, 0);
     lcd.print("Waiting for hub");
     lcd.setCursor(0, 1);
-    lcd.print("To Connect");
+    lcd.print("to Connect");
     digitalWrite(bluePin, HIGH);
     digitalWrite(redPin, HIGH);
     digitalWrite(greenPin, HIGH);
-    delay(100);
+    delay(500);
   } else {
     if (rfid.PICC_IsNewCardPresent()) { // new tag is available
       if (rfid.PICC_ReadCardSerial()) { // NUID has been readed
