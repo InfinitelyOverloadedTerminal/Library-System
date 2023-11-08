@@ -87,4 +87,97 @@ if (espNowMode) {
   memcpy(peerInfo.peer_addr, receiverMac, 6);
   peerInfo.channel = 0;  
   peerInfo.encrypt = false;
+
+
+// Add peer        
+  if (esp_now_add_peer(&peerInfo) != ESP_OK){
+    Serial.println("Failed to add peer");
+    return;
+  }
+  // Register for a callback function that will be called when data is received
+  esp_now_register_recv_cb(OnDataRecv);
+} 
+else {
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED){
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  // Assign the api key (required) /
+  config.api_key = API_KEY;
+  // Assign the RTDB URL (required) /
+  config.database_url = DATABASE_URL;
+  // Sign up /
+  if (Firebase.signUp(&config, &auth, "", "")){
+    Serial.println("ok");
+    signupOK = true;
+  }
+  else{
+    Serial.printf("%s\n", config.signer.signupError.message.c_str());
+  }
+
+  // Assign the callback function for the long running token generation task */
+  config.token_status_callback = tokenStatusCallback; //see addons/TokenHelper.h
+  Firebase.begin(&config, &auth);
+  Firebase.reconnectWiFi(true);
+
+  }
+}
+
+void resetWiFiConnection() {
+  // Disconnect from the current Wi-Fi network and clear stored credentials
+  WiFi.disconnect(true);
+}
+// Function to send a command and data to the receiver
+void sendCommandAndData(uint8_t command, const String& data) {
+  struct_message message;
+  message.command = command;
+  data.toCharArray(message.data, sizeof(message.data));
+  esp_err_t result = esp_now_send(receiverMac, (uint8_t *)&message, sizeof(message));
+
+  if (result == ESP_OK) {
+    Serial.println("Sent with success");
+  } else {
+    Serial.println("Error sending the data");
+  }
+}
+
+void loop() {
   
+if (espNowMode) {
+  sendCommandAndData(0, "All Good!");
+  delay(10000); // Send every 10 seconds
+}
+else {
+    if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)) {
+    sendDataPrevMillis = millis();
+    // Write an Int number on the database path test/int
+    for (int i = 0; i < 2; i++) {
+        String test = String(incomingMessage.command);
+        test += "/UserID";
+        test += String(count);
+      if (Firebase.RTDB.set(&fbdo, test, incomingMessage.data)){
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+        count++;
+      }
+    else {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+      } 
+  } 
+  }
+}
+
+espNowMode = !espNowMode;
+resetWiFiConnection();
+setup();
+}
