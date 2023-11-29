@@ -16,7 +16,7 @@
 
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
 MFRC522 rfid(SS_PIN, RST_PIN);
-uint8_t receiverMac[] = {0x8C, 0x4B, 0x14, 0x3B, 0x54, 0xE0};
+uint8_t receiverMac[] = {0x8C, 0x4B, 0x14, 0x39, 0x42, 0x98};
 
 esp_now_peer_info_t peerInfo;
 
@@ -62,7 +62,7 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   Serial.print("Received Data: ");
   Serial.println(receivedData);
   // Perform actions based on receivedCommand and receivedData here
-  if(receivedCommand == 0) {
+  if(receivedCommand == 42) {
     if(!ableToRun) {
       ableToRun = true;
       lcd.clear();
@@ -71,6 +71,138 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
       lcd.print(tableNum);
     }
   }
+}
+
+void displayReservationCleared() {
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print("Reservation");
+	lcd.setCursor(0, 1);
+	lcd.print("Cleared");
+	digitalWrite(bluePin, LOW);
+    digitalWrite(redPin, LOW);
+    digitalWrite(greenPin, HIGH);
+	return;
+}
+
+void sayHello() {
+	lcd.clear();
+	 lcd.setCursor(0, 0);
+	lcd.print("Welcome: ");
+	lcd.setCursor(0, 1);
+	lcd.print(rfidArr);
+	digitalWrite(bluePin, HIGH);
+	digitalWrite(redPin, LOW);
+	digitalWrite(greenPin, LOW);
+	return;
+}
+
+void sayGoodbye() {
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print("Goodbye: ");
+	lcd.setCursor(0, 1);
+	lcd.print(rfidArr);
+	digitalWrite(bluePin, HIGH);
+	digitalWrite(redPin, LOW);
+	digitalWrite(greenPin, LOW);
+	return;
+}
+
+void sayCapacity() {
+	lcd.clear();
+	lcd.setCursor(0, 0);
+	lcd.print("Seats Occupied:");
+	lcd.setCursor(0, 1);
+	lcd.print(seatsNum);
+	lcd.print("/");
+	lcd.print(capacityNum);
+	return;
+}
+
+void checkIn() {
+	for (int i = 0; i <= tableCapacity; i++) {
+	  //Serial.print("Checking i=");
+	  //Serial.print(i);
+	  //Serial.print(" occupant is: ");
+	  //Serial.println(occupants[i]);
+	  if((strcmp(occupants[i], rfidArr)) == 0) {
+      //Serial.print("Found match at ");
+      //Serial.println(i);
+      strcpy(occupants[i], "");
+      sendCommandAndData(i+1, "EMPTY");
+      sayGoodbye();
+      occupiedSeats--;
+      /*for (int j = i; j <= tableCapacity; j++) {
+        //Serial.print("Checking j=");
+        //Serial.print(j);
+        //Serial.print(" occupant is: ");
+        //Serial.println(occupants[j]);
+        if((strcmp(occupants[j], "")) != 0) {
+        //Serial.print("Found non blank entry at ");
+        //Serial.println(j);
+        strcpy(occupants[j-1], occupants[j]);
+        }
+      }
+      */
+      delay(1000);
+      sprintf(seatsNum, "%d", occupiedSeats);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Seats Occupied:");
+      lcd.setCursor(0, 1);
+      lcd.print(seatsNum);
+      lcd.print("/");
+      lcd.print(capacityNum);
+      digitalWrite(bluePin, LOW);
+      digitalWrite(redPin, LOW);
+      digitalWrite(greenPin, HIGH); 
+      return;
+    }
+  }
+	if(occupiedSeats >= tableCapacity) {
+	  Serial.println("Table is full");
+	  lcd.clear();
+	  lcd.setCursor(0, 0);
+	  lcd.print("This Table is");
+	  lcd.setCursor(0, 1);
+	  lcd.print("Completely Full");
+	  digitalWrite(bluePin, LOW);
+	  digitalWrite(redPin, HIGH);
+	  digitalWrite(greenPin, LOW);
+	  delay(1000);
+	  digitalWrite(bluePin, LOW);
+	  digitalWrite(redPin, HIGH);
+	  digitalWrite(greenPin, LOW);
+	  lcd.clear();
+	  lcd.setCursor(0, 0);
+	  lcd.print("Tap Card to");
+	  lcd.setCursor(0, 1);
+	  lcd.print("Check Out");
+	  //goto start;
+	} else {
+    for (int i = 0; i <= tableCapacity; i++) {
+        //Serial.print("Checking j=");
+        //Serial.print(i);
+        //Serial.print(" occupant is: ");
+        //Serial.println(occupants[i]);
+        if((strcmp(occupants[i], "")) == 0) {
+        //Serial.print("Found blank entry at ");
+        //Serial.println(j);
+        strcpy(occupants[i], rfidArr);
+        sayHello();
+        occupiedSeats++;
+        sendCommandAndData(i+1, rfidArr);
+        delay(1000);
+        sprintf(seatsNum, "%d", occupiedSeats);
+        sayCapacity();
+        digitalWrite(bluePin, LOW);
+        digitalWrite(redPin, LOW);
+        digitalWrite(greenPin, HIGH); 
+        return;
+        }
+    }
+	}
 }
 
 void setup() {
@@ -176,9 +308,9 @@ void loop() {
   if (!ableToRun) {
     lcd.clear();
     lcd.setCursor(0, 0);
-    lcd.print("Waiting for hub");
+    lcd.print("Await Encrypted");
     lcd.setCursor(0, 1);
-    lcd.print("to Connect");
+    lcd.print("Hub Connection");
     digitalWrite(bluePin, HIGH);
     digitalWrite(redPin, HIGH);
     digitalWrite(greenPin, HIGH);
@@ -198,95 +330,8 @@ void loop() {
           Serial.println(rfidArr);
           if (mode == 1) {
             Serial.println("Mode 1");
-            for (int i = 0; i <= occupiedSeats; i++) {
-                  //Serial.print("Checking i=");
-                  //Serial.print(i);
-                  //Serial.print(" occupant is: ");
-                  //Serial.println(occupants[i]);
-                  if((strcmp(occupants[i], rfidArr)) == 0) {
-                    //Serial.print("Found match at ");
-                    //Serial.println(i);
-                    strcpy(occupants[i], "");
-                    lcd.clear();
-                    lcd.setCursor(0, 0);
-                    lcd.print("Goodbye: ");
-                    lcd.setCursor(0, 1);
-                    lcd.print(rfidArr);
-                    digitalWrite(bluePin, HIGH);
-                    digitalWrite(redPin, LOW);
-                    digitalWrite(greenPin, LOW);
-                    occupiedSeats--;
-                    for (int j = i; j <= tableCapacity; j++) {
-                      //Serial.print("Checking j=");
-                      //Serial.print(j);
-                      //Serial.print(" occupant is: ");
-                      //Serial.println(occupants[j]);
-                      if((strcmp(occupants[j], "")) != 0) {
-                        //Serial.print("Found non blank entry at ");
-                        //Serial.println(j);
-                        strcpy(occupants[j-1], occupants[j]);
-                      }
-                    }
-                    delay(1000);
-                    sprintf(seatsNum, "%d", occupiedSeats);
-                    lcd.clear();
-                    lcd.setCursor(0, 0);
-                    lcd.print("Seats Occupied:");
-                    lcd.setCursor(0, 1);
-                    lcd.print(seatsNum);
-                    lcd.print("/");
-                    lcd.print(capacityNum);
-                    digitalWrite(bluePin, LOW);
-                    digitalWrite(redPin, LOW);
-                    digitalWrite(greenPin, HIGH); 
-                    goto start;
-                  }
-              }
-            if(occupiedSeats >= tableCapacity) {
-                  Serial.println("Table is full");
-                  lcd.clear();
-                  lcd.setCursor(0, 0);
-                  lcd.print("This Table is");
-                  lcd.setCursor(0, 1);
-                  lcd.print("Completely Full");
-                  digitalWrite(bluePin, LOW);
-                  digitalWrite(redPin, HIGH);
-                  digitalWrite(greenPin, LOW);
-                  delay(1000);
-                  digitalWrite(bluePin, LOW);
-                  digitalWrite(redPin, HIGH);
-                  digitalWrite(greenPin, LOW);
-                  lcd.clear();
-                  lcd.setCursor(0, 0);
-                  lcd.print("Tap Card to");
-                  lcd.setCursor(0, 1);
-                  lcd.print("Check Out");
-                  //goto start;
-            } else {
-              strcpy(occupants[occupiedSeats], rfidArr);
-              lcd.clear();
-              lcd.setCursor(0, 0);
-              lcd.print("Welcome: ");
-              lcd.setCursor(0, 1);
-              lcd.print(rfidArr);
-              digitalWrite(bluePin, HIGH);
-              digitalWrite(redPin, LOW);
-              digitalWrite(greenPin, LOW);
-              occupiedSeats++;
-              sendCommandAndData(tableNumber, rfidArr);
-              delay(1000);
-              sprintf(seatsNum, "%d", occupiedSeats);
-              lcd.clear();
-              lcd.setCursor(0, 0);
-              lcd.print("Seats Occupied:");
-              lcd.setCursor(0, 1);
-              lcd.print(seatsNum);
-              lcd.print("/");
-              lcd.print(capacityNum);
-              digitalWrite(bluePin, LOW);
-              digitalWrite(redPin, LOW);
-              digitalWrite(greenPin, HIGH); 
-            }
+            checkIn();
+			goto start;
           } else if (mode == 2) {
             Serial.println("Mode 2");
             lcd.clear();
@@ -298,26 +343,21 @@ void loop() {
             digitalWrite(bluePin, LOW);
             digitalWrite(redPin, HIGH);
             digitalWrite(greenPin, LOW);
+            sendCommandAndData(0, "RESERVED");
             delay(1000);
             strncpy(reservedBy, rfidArr, sizeof(rfidArr));
             mode = 3;
             goto start;
           }
-          else if (mode == 3) {
+          else if (mode == 3) { //Reserved
             Serial.println("Mode 3");
             Serial.print("Reserved by: ");
             Serial.print(reservedBy);
             Serial.print(" and being scanned by: ");
             Serial.println(rfidArr);
             if((strcmp(reservedBy, rfidArr)) == 0) {
-                lcd.clear();
-                lcd.setCursor(0, 0);
-                lcd.print("Reservation");
-                lcd.setCursor(0, 1);
-                lcd.print("Cleared");
-                digitalWrite(bluePin, LOW);
-                digitalWrite(redPin, LOW);
-                digitalWrite(greenPin, HIGH);
+                displayReservationCleared();
+                sendCommandAndData(0, "RELEASE");
                 strcpy(reservedBy, "");
                 delay(1000);
                 mode = 2;
@@ -361,3 +401,4 @@ void sendCommandAndData(uint8_t command, const String& data) {
     Serial.println("Error sending the data");
   }
 }
+
