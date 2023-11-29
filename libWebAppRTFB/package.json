@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "firebase": "^10.6.0"
+    "firebase": "^10.6.0",
+    "ngrok": "^5.0.0-beta.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
