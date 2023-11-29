@@ -15,74 +15,74 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Update progress bar
-function updateProgressBar(value) {
-  var newValue = ((value / 4095) * 100).toFixed(2);
+// // Update progress bar
+// function updateProgressBar(value) {
+//   var newValue = ((value / 4095) * 100).toFixed(2);
 
-  const displaySpan = document.getElementById("ldrVal");
-  var progressBar = document.getElementById("ldrRange");
-  displaySpan.textContent = value;
+//   const displaySpan = document.getElementById("ldrVal");
+//   var progressBar = document.getElementById("ldrRange");
+//   displaySpan.textContent = value;
 
-  // Update the width and aria-valuenow attribute
-  progressBar.style.width = newValue + "%";
-  progressBar.setAttribute('aria-valuenow', newValue);
-  progressBar.textContent = newValue;
-}
-// get ldr value from database on change, update progress bar
-function getLDRValue() {
-  const reference = ref(db, "ldr/value");
+//   // Update the width and aria-valuenow attribute
+//   progressBar.style.width = newValue + "%";
+//   progressBar.setAttribute('aria-valuenow', newValue);
+//   progressBar.textContent = newValue;
+// }
+// // get ldr value from database on change, update progress bar
+// function getLDRValue() {
+//   const reference = ref(db, "ldr/value");
 
-  onValue(reference, (snapshot) => {
-    const data = snapshot.val();
-    updateProgressBar(data);
-  });
-}
-getLDRValue();
+//   onValue(reference, (snapshot) => {
+//     const data = snapshot.val();
+//     updateProgressBar(data);
+//   });
+// }
+// getLDRValue();
 
-//Update LED state
-document.getElementById('ledStatusButton').addEventListener('click', function() {
-  const ledRef = ref(db, 'ldr/state');
+// //Update LED state
+// document.getElementById('ledStatusButton').addEventListener('click', function() {
+//   const ledRef = ref(db, 'ldr/state');
   
-  get(ledRef).then((snapshot) => {
-    const isLedOn = snapshot.val();
+//   get(ledRef).then((snapshot) => {
+//     const isLedOn = snapshot.val();
 
-    const led = ref(db, 'ldr/');
-    update(led, { state: !isLedOn });
+//     const led = ref(db, 'ldr/');
+//     update(led, { state: !isLedOn });
     
-    updateLedStatusButton(!isLedOn);
-  });
-});
+//     updateLedStatusButton(!isLedOn);
+//   });
+// });
 
-// get ldr value from database on change, update slider
-function getLEDState() {
-  // Listen for changes in LED state from Firebase
-  const ledRef = ref(db, 'ldr/state');
-  onValue(ledRef, (snapshot) => {
-    const isLedOn = snapshot.val();
-    updateLedStatusButton(isLedOn);
-  });
-}
-getLEDState();
+// // get ldr value from database on change, update slider
+// function getLEDState() {
+//   // Listen for changes in LED state from Firebase
+//   const ledRef = ref(db, 'ldr/state');
+//   onValue(ledRef, (snapshot) => {
+//     const isLedOn = snapshot.val();
+//     updateLedStatusButton(isLedOn);
+//   });
+// }
+// getLEDState();
 
-function updateLedStatusButton(isLedOn) {
-  const button = document.getElementById('ledStatusButton');
-  if (isLedOn) {
-      button.textContent = 'LED is On';
-      button.classList.remove('btn-secondary');
-      button.classList.add('btn-success');
-  } else {
-      button.textContent = 'LED is Off';
-      button.classList.remove('btn-success');
-      button.classList.add('btn-secondary');
-  }
-}
+// function updateLedStatusButton(isLedOn) {
+//   const button = document.getElementById('ledStatusButton');
+//   if (isLedOn) {
+//       button.textContent = 'LED is On';
+//       button.classList.remove('btn-secondary');
+//       button.classList.add('btn-success');
+//   } else {
+//       button.textContent = 'LED is Off';
+//       button.classList.remove('btn-success');
+//       button.classList.add('btn-secondary');
+//   }
+// }
 
-// Now update LED brightness
-document.getElementById('ledRange').addEventListener('change', function() {
-  const value = this.value;
-  const led = ref(db, 'ldr/');
-  update(led, { intensity: parseInt(value) });
-});
+// // Now update LED brightness
+// document.getElementById('ledRange').addEventListener('change', function() {
+//   const value = this.value;
+//   const led = ref(db, 'ldr/');
+//   update(led, { intensity: parseInt(value) });
+// });
 
 // get all key with "Table" in name
 function fetchAndListenToTables() {
@@ -92,7 +92,7 @@ function fetchAndListenToTables() {
     const allTables = snapshot.val();
     if (allTables) {
       Object.keys(allTables).forEach((tableId) => {
-        if (tableId.startsWith('Table')) {
+        if (tableId.startsWith('Table ')) {
           // Assuming you're looking for nodes that start with 'Table'
           const tableData = allTables[tableId];
           // update table info and set state to false in DB
@@ -116,8 +116,8 @@ function updateTableDisplay(tableId, tableData) {
     tablesList.appendChild(tableItem);
   }
 
-  // Add 'table-item' class and additional class based on reserved status
-  tableItem.className = `table-item ${tableData.reserved ? 'reserved' : 'available'}`;
+  // Apply 'red-table' class if reserved, otherwise use 'table-item'
+  tableItem.className = tableData.reserved ? 'table-item red-table' : 'table-item';
 
   // Generate HTML for each seat
   let seatsHtml = '';
@@ -134,6 +134,5 @@ function updateTableDisplay(tableId, tableData) {
     <ul class="seats">${seatsHtml}</ul>
   `;
 }
-
 
 fetchAndListenToTables();

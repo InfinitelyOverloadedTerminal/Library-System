@@ -119,21 +119,12 @@
                 margin-bottom: 10px;
             }
         }
-
-        .table-item.reserved {
-            background-color: #ff6868; /* Red for reserved tables */
-            color: white;
-        }
-        .table-item.available {
-            background-color: #68ff68;
-            color: black;
-        }
         
     </style>
 </head>
 <body>
 
-    <!-- Add Range Slider -->
+    <!-- Add Range Slider
     <div class="container">
         <h1>Light Dependent Resistor Value: <span id="ldrVal">0</span> </h1>
         <div class="progress">
@@ -145,13 +136,19 @@
 
         <h1>LED Status:</h1>
         <button id="ledStatusButton" class="btn btn-secondary">LED is Off</button>
-    </div>
+    </div> -->
 
     <body>
-        <body>
+
+                    <div class="container mt-4">
+                        <h2>Available Tables</h2>
+                        <div id="tablesDisplay" class="row">
+                            <!-- Tables will be displayed here -->
+                        </div>
+                    </div>
                     <ul class="table-list">
                         <!-- Table 1 -->
-                        <li class="table-item">
+                        <!-- <li class="table-item">
                             <h3>Table 1</h3>
                             <ul class="seats">
                                 <li class="seat">Seat 1</li>
@@ -160,7 +157,7 @@
                                 <li class="seat">Seat 4</li>
                             </ul>
                         </li>
-                        <!-- Table 2 -->
+                        Table 2
                         <li class="table-item">
                             <h3>Table 2</h3>
                             <ul class="seats">
@@ -169,16 +166,10 @@
                                 <li class="seat">Seat 3</li>
                                 <li class="seat">Seat 4</li>
                             </ul>
-                        </li>
+                        </li> -->
                     </ul>
 
-                    <div class="container mt-4">
-                        <h2>Available Tables</h2>
-                        <div id="tablesDisplay" class="row">
-                            <!-- Tables will be displayed here -->
-                        </div>
-                    </div>
-        </body>
+
     </body>
 
     <script>
