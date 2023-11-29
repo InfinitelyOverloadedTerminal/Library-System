@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, update, onValue, get} from "firebase/database";
+import { getDatabase, ref, set, update, onValue, get, remove } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAG2ogN6DiJ8EJbh5sTSwHCPPPIWXod3ZE",
@@ -119,18 +119,66 @@ function updateTableDisplay(tableId, tableData) {
 
   let seatsHtml = '';
   for (const seatId in tableData) {
-    if (seatId !== 'reserved') { // Exclude the 'reserved' field
+    if (seatId !== 'reserved') {
       const seatValue = tableData[seatId];
-      seatsHtml += `<li class="seat"> ID: ${seatValue}</li>`;
+      // Check if the seat value is 0 and adjust the display accordingly
+      seatsHtml += `<li class="seat">${seatValue === 0 ? 'Empty' : `ID: ${seatValue}`}</li>`;
     }
   }
 
+  // Add a delete button to each table
   tableItem.innerHTML = `
     <h3>${tableId}</h3>
     <ul class="seats">${seatsHtml}</ul>
   `;
+
+  const deleteButton = document.createElement('button');
+  deleteButton.textContent = 'Delete All Seats';
+  deleteButton.style.backgroundColor = '#f44336'; // Red color
+  deleteButton.style.color = 'white';
+  deleteButton.style.border = 'none';
+  deleteButton.style.padding = '10px 20px';
+  deleteButton.style.borderRadius = '4px';
+  deleteButton.style.cursor = 'pointer';
+  deleteButton.style.marginTop = '10px';
+  deleteButton.textContent = 'Delete All Seats';
+  deleteButton.addEventListener('click', function() {
+    deleteTableSeats(tableId);
+  });
+
+  // Append the delete button to the tableItem
+  tableItem.appendChild(deleteButton);
+
 }
 
+function deleteTableSeats(tableId) {
+  const tableRef = ref(db, `Tables/${tableId}`);
+
+  get(tableRef).then((snapshot) => {
+    const tableData = snapshot.val();
+    if (tableData) {
+      const updates = {};
+      Object.keys(tableData).forEach((seatId) => {
+        if (seatId !== 'reserved') {
+          updates[`${tableId}/${seatId}`] = 0;
+        }
+      });
+
+      // Perform the update
+      if (Object.keys(updates).length > 0) {
+        update(ref(db, 'Tables'), updates)
+          .then(() => {
+            console.log('Seats updated to "empty" successfully');
+          })
+          .catch((error) => {
+            console.error("Error updating seats: ", error);
+          });
+      }
+    }
+  }).catch((error) => {
+    console.error("Error fetching table data: ", error);
+  });
+}
 
 
 
