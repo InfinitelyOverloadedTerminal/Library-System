@@ -1,9 +1,4 @@
-#include <esp_now.h> //Needed for ESPNow
-#include <WiFi.h> //Needed for ESPNow
-#include <Arduino.h>
-#include <Firebase_ESP_Client.h>
-
-
+<Firebase_ESP_Client.h>
 // Connecting to firebase
 //Provide the token generation process info.
 #include "addons/TokenHelper.h"
