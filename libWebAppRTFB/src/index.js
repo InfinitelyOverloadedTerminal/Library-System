@@ -107,32 +107,31 @@ function fetchAndListenToTables() {
 function updateTableDisplay(tableId, tableData) {
   const tablesList = document.querySelector('.table-list');
 
-  // Check if the table is already displayed
   let tableItem = document.getElementById(`table-${tableId}`);
   if (!tableItem) {
-    // Create a new list item for the table if it doesn't exist
     tableItem = document.createElement('li');
+    tableItem.classList.add('table-item');
     tableItem.id = `table-${tableId}`;
     tablesList.appendChild(tableItem);
   }
 
-  // Apply 'red-table' class if reserved, otherwise use 'table-item'
   tableItem.className = tableData.reserved ? 'table-item red-table' : 'table-item';
 
-  // Generate HTML for each seat
   let seatsHtml = '';
   for (const seatId in tableData) {
-    if (tableData.hasOwnProperty(seatId) && seatId.startsWith('Seat')) {
-      const seat = tableData[seatId];
-      seatsHtml += `<li class="seat ${seat.isAvailable ? 'available' : 'occupied'}">${seatId}</li>`;
+    if (seatId !== 'reserved') { // Exclude the 'reserved' field
+      const seatValue = tableData[seatId];
+      seatsHtml += `<li class="seat"> ID: ${seatValue}</li>`;
     }
   }
 
-  // Update the content of the table list item
   tableItem.innerHTML = `
     <h3>${tableId}</h3>
     <ul class="seats">${seatsHtml}</ul>
   `;
 }
+
+
+
 
 fetchAndListenToTables();
