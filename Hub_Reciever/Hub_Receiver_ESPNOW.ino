@@ -20,8 +20,8 @@ bool messageSent = false;
 
 // Callback when data is sent
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  Serial.print("Last Packet Send Status: ");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+ /* Serial.print("Last Packet Send Status: ");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");*/
 }
 
 // Callback when data is received
@@ -32,7 +32,9 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   uint8_t receivedCommand = incomingMessage.command;
   String receivedData = String(incomingMessage.data);
 
-  /*Serial.print("Received Command: ");
+  Serial.print(incomingMessage.data);
+  Serial.println(incomingMessage.command);
+ /* Serial.print("Received Command: ");
   Serial.println(receivedCommand);
   Serial.print("Received Data: ");
   Serial.println(receivedData);*/
@@ -48,7 +50,7 @@ void setup() {
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
+    /*Serial.println("Error initializing ESP-NOW");*/
     return;
   }
 
@@ -63,14 +65,15 @@ void setup() {
   
   // Add peer        
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    Serial.println("Failed to add peer");
+    /*Serial.println("Failed to add peer");*/
     return;
   }
   // Register for a callback function that will be called when data is received
   esp_now_register_recv_cb(OnDataRecv);
-
+  delay(10000);
   pinMode(Enable_pin, OUTPUT);
   digitalWrite(Enable_pin, HIGH); // (HIGH to send to slave)
+  Serial.println();
 
 }
 
@@ -91,11 +94,12 @@ void sendCommandAndData(uint8_t command, const String& data) {
 void loop() {
   // Example: Send command number 42 and a string as data
   
-  if(!messageSent)
-  {
-    sendCommandAndData(42, "Hello! How are you!");
-    Serial.println(incomingMessage.data);
-    messageSent = true; 
-  }
-  delay(10000); // Send every 10 seconds
+  
+  sendCommandAndData(42, "All clear!");
+  delay(10000);
+
+
+    
+  
+  
 }
