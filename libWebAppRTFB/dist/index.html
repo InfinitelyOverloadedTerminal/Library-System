@@ -8,63 +8,127 @@
     <title>Bootstrap demo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
-  <style>
+    <style>
+        .red-table {
+            background-color: red !important; /* Override any other background color */
+        }
         body {
-            background-color: #dfdede;
-            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f4f4;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
+            padding: 20px;
         }
         h1 {
-            color: #666;
-            margin: 0;
-            padding: 20px;
+            color: #4a4e69;
+            margin-bottom: 20px;
         }
-        h2 {
-            color: #666;
-            margin: 0;
-            padding: 20px;
-        }
-        
         .table-list {
             list-style-type: none;
             padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            justify-content: center;
         }
-
         .table-item {
-            margin-bottom: 15px;
-            padding: 10px;
-            border: 1px solid #ddd;                border-radius: 5px;
+            background-color: #9e959d;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            transition: background-color 0.5s ease;
         }
-
+        .table-item:hover {
+            background-color: #56ba8f; /* Dark green color on hover */
+        }
         .table-item h3 {
-            margin: 0 0 10px 0;
-                color: #333;
+            color: rgb(83, 38, 5);
+            margin: 0 0 40px 0;
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: text-shadow 0.5s ease;
+            /* box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+            background-color: #9e959d;
+            padding: 10px;
+            border-radius: 8px 8px 0 0; Rounded corners on top */
         }
-
+        .table-item h3:hover {
+            text-shadow: 2px 2px 4px rgba(50, 47, 47, 0.4); /* Text shadow */
+        }
         .seats {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
             list-style-type: none;
             padding: 0;
         }
-
         .seat {
-            width: 20%;
-            padding:10px;
+            background-color: #4a4e69;
+            padding: 10px 15px;
             text-align: center;
-            border: 1px solid black;
             border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s ease;
+            width: 20%;
+                /* Existing styles */
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
         }
+        .seat::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background-color: #22223b;
+            transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        .seat:hover::before {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0); }
+        }
+
+        /* Keyframes for glowing effect */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px #4a4e69, 0 0 20px #4a4e69; }
+            50% { box-shadow: 0 0 15px #22223b, 0 0 30px #22223b; }
+        }
+        .seat:hover, .seat:focus {
+            animation: float 2s ease-in-out infinite, glow 2s linear infinite;
+            background-color: #22223b;
+            transform: scale(1.1);
+        }
+        .seat > * {
+            position: relative;
+            z-index: 1;
+        }
+        @media (max-width: 600px) {
+            .seats {
+                flex-direction: column;
+            }
+            .seat {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+        }
+
         .table-item.reserved {
             background-color: #ff6868; /* Red for reserved tables */
             color: white;
         }
-
         .table-item.available {
-            background-color: #68ff68; /* Green for available tables */
+            background-color: #68ff68;
             color: black;
         }
-
+        
     </style>
 </head>
 <body>
