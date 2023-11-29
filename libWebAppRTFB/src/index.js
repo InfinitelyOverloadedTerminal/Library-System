@@ -2,15 +2,15 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, update, onValue, get} from "firebase/database";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD7ERj1W04Bdo8oymV8KOxLbQDIxXkLyU4",
-    authDomain: "esp32-communication-test.firebaseapp.com",
-    databaseURL: "https://esp32-communication-test-default-rtdb.firebaseio.com",
-    projectId: "esp32-communication-test",
-    storageBucket: "esp32-communication-test.appspot.com",
-    messagingSenderId: "655675116449",
-    appId: "1:655675116449:web:38145ddc763758af7559e0",
-    measurementId: "G-X5X6N9T403"
-  };
+  apiKey: "AIzaSyAG2ogN6DiJ8EJbh5sTSwHCPPPIWXod3ZE",
+  authDomain: "library-seating-system.firebaseapp.com",
+  databaseURL: "https://library-seating-system-default-rtdb.firebaseio.com",
+  projectId: "library-seating-system",
+  storageBucket: "library-seating-system.appspot.com",
+  messagingSenderId: "329372628077",
+  appId: "1:329372628077:web:6620e71f80f51c947fbb64",
+  measurementId: "G-V6F704DM9E"
+};
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
@@ -83,6 +83,9 @@ document.getElementById('ledRange').addEventListener('change', function() {
   const led = ref(db, 'ldr/');
   update(led, { intensity: parseInt(value) });
 });
+
+
+
 
 
 
