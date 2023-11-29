@@ -21,6 +21,7 @@ uint8_t receiverMac[] = {0x8C, 0x4B, 0x14, 0x39, 0x42, 0x98};
 esp_now_peer_info_t peerInfo;
 
 typedef struct struct_message {
+  uint8_t sender;
   uint8_t command;
   char data[32];
 } struct_message;
@@ -55,21 +56,22 @@ void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&incomingMessage, incomingData, sizeof(incomingMessage));
   // Parse and process the received data
   uint8_t receivedCommand = incomingMessage.command;
+  uint8_t receivedSender = incomingMessage.sender;
   String receivedData = String(incomingMessage.data);
 
+  Serial.print("Received from Sender: ");
+  Serial.println(receivedSender);
   Serial.print("Received Command: ");
   Serial.println(receivedCommand);
   Serial.print("Received Data: ");
   Serial.println(receivedData);
   // Perform actions based on receivedCommand and receivedData here
-  if(receivedCommand == 42) {
-    if(!ableToRun) {
-      ableToRun = true;
-      lcd.clear();
-      lcd.setCursor(0, 0);
-      lcd.print("Table Number: ");
-      lcd.print(tableNum);
-    }
+  if(!ableToRun && receivedSender == 0 && receivedCommand == 42) {
+    ableToRun = true;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Table Number: ");
+    lcd.print(tableNum);
   }
 }
 
@@ -130,7 +132,7 @@ void checkIn() {
       //Serial.print("Found match at ");
       //Serial.println(i);
       strcpy(occupants[i], "");
-      sendCommandAndData(i+1, "EMPTY");
+      sendCommandAndData(tableNumber, i+1, "EMPTY");
       sayGoodbye();
       occupiedSeats--;
       /*for (int j = i; j <= tableCapacity; j++) {
@@ -192,7 +194,7 @@ void checkIn() {
         strcpy(occupants[i], rfidArr);
         sayHello();
         occupiedSeats++;
-        sendCommandAndData(i+1, rfidArr);
+        sendCommandAndData(tableNumber, i+1, rfidArr);
         delay(1000);
         sprintf(seatsNum, "%d", occupiedSeats);
         sayCapacity();
@@ -343,7 +345,7 @@ void loop() {
             digitalWrite(bluePin, LOW);
             digitalWrite(redPin, HIGH);
             digitalWrite(greenPin, LOW);
-            sendCommandAndData(0, "RESERVED");
+            sendCommandAndData(tableNumber, 0, "RESERVED");
             delay(1000);
             strncpy(reservedBy, rfidArr, sizeof(rfidArr));
             mode = 3;
@@ -357,7 +359,7 @@ void loop() {
             Serial.println(rfidArr);
             if((strcmp(reservedBy, rfidArr)) == 0) {
                 displayReservationCleared();
-                sendCommandAndData(0, "RELEASE");
+                sendCommandAndData(tableNumber, 0, "RELEASE");
                 strcpy(reservedBy, "");
                 delay(1000);
                 mode = 2;
@@ -389,9 +391,10 @@ void loop() {
 }
 
 // Function to send a command and data to the receiver
-void sendCommandAndData(uint8_t command, const String& data) {
+void sendCommandAndData(uint8_t sender, uint8_t command, const String& data) {
   struct_message message;
   message.command = command;
+  message.sender = sender;
   data.toCharArray(message.data, sizeof(message.data));
   esp_err_t result = esp_now_send(receiverMac, (uint8_t *)&message, sizeof(message));
 
