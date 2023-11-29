@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Document</title>
+</head>
+<body>
+    <h1>My bored app <i class="fa fa-microchip" aria-hidden="true"></i></h1>
+    <br>
+    <h4>Number of participant(s)</h4>
+    <input type="text" name="Number of People" id="participantNum" value="1">
+    <input type="button" id="getActivity" value="Get Activity ">
+    
+    <div class="textSection" id="responseSection">
+        <p>Here are some ideas</p>
+        <p id="resp"></p>     
+    </div>
+    <br>
+
+
+    <div id="reaction">
+        <!--Insert thumbs up and down button-->
+    </div>  
+
+</body>
+
+
+
+<script>
+    //https://www.boredapi.com/api/activity?participants=1
+    var apiEndPoint ="https://www.boredapi.com/api/activity?participants=";
+    var numPart = 1;
+
+    function getActivities(numPart){
+        url = apiEndPoint.concat(String(numPart));
+        console.log(url);
+        
+        //
+    }
+    
+    fetchbtn = document.getElementById("getActivity");
+    dataOut = document.getElementById("responseSection")
+    
+    fetchbtn.addEventListener("click", function () {
+        //
+        getActivities(numPart);
+    });
+
+    function displayActivity(data){
+        //make section visible
+        dataOut.style.display = "block";
+        textOut = document.getElementById("resp")
+        textOut.innerHTML = String(data.activity)
+    }
+    
+</script>
+</html>
