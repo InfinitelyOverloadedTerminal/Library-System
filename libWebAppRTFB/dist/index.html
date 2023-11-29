@@ -119,10 +119,21 @@
             transition: width 0.3s ease, height 0.3s ease, transform 0.3s ease;
             transform: translate(-50%, -50%) scale(0);
             border-radius: 50%;
-            z-index: 0;
+            z-index: 10;
+        }
+        .seat:hover .seat-text {
+            z-index: 6;
+        }
+        .seat-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            z-index: 5; /* Higher than the seat's pseudo-elements */
+            color: #fff; /* Or any color that contrasts well with the seat */
         }
         .seat:hover::before {
-            transform: translate(-50%, -50%) scale(1);
+            transform: translate(-50%, -50%) scale(0);
         }
         @keyframes float {
             0% { transform: translateY(0); }
@@ -186,12 +197,35 @@
                 transform: translateY(200px) translateX(-200px);
             }
         }
+
+        /* Add this to your existing style block */
+        @keyframes colorChange {
+            0% { color: #56ba8f; }
+            25% { color: #9e959d; }
+            50% { color: #4a4e69; }
+            75% { color: #22223b; }
+            100% { color: #56ba8f; }
+        }
+
+        .container h2 {
+            animation: colorChange 10s infinite;
+        }
+
+
+
+
+
+
+
         
     </style>
 </head>
 <body>
 
     <div id="spaceBackground"></div>
+
+    
+
     <!-- Add Range Slider
     <div class="container">
         <h1>Light Dependent Resistor Value: <span id="ldrVal">0</span> </h1>
