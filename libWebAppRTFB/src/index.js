@@ -84,8 +84,56 @@ document.getElementById('ledRange').addEventListener('change', function() {
   update(led, { intensity: parseInt(value) });
 });
 
+// get all key with "Table" in name
+function fetchAndListenToTables() {
+  const tablesRef = ref(db, 'Tables');
+
+  onValue(tablesRef, (snapshot) => {
+    const allTables = snapshot.val();
+    if (allTables) {
+      Object.keys(allTables).forEach((tableId) => {
+        if (tableId.startsWith('Table')) {
+          // Assuming you're looking for nodes that start with 'Table'
+          const tableData = allTables[tableId];
+          // update table info and set state to false in DB
+          const tableRef = ref(db, `Tables/${tableId}`);
+          updateTableDisplay(tableId, tableData);
+        }
+      });
+    }
+  });
+}
+
+function updateTableDisplay(tableId, tableData) {
+  const tablesList = document.querySelector('.table-list');
+
+  // Check if the table is already displayed
+  let tableItem = document.getElementById(`table-${tableId}`);
+  if (!tableItem) {
+    // Create a new list item for the table if it doesn't exist
+    tableItem = document.createElement('li');
+    tableItem.id = `table-${tableId}`;
+    tablesList.appendChild(tableItem);
+  }
+
+  // Add 'table-item' class and additional class based on reserved status
+  tableItem.className = `table-item ${tableData.reserved ? 'reserved' : 'available'}`;
+
+  // Generate HTML for each seat
+  let seatsHtml = '';
+  for (const seatId in tableData) {
+    if (tableData.hasOwnProperty(seatId) && seatId.startsWith('Seat')) {
+      const seat = tableData[seatId];
+      seatsHtml += `<li class="seat ${seat.isAvailable ? 'available' : 'occupied'}">${seatId}</li>`;
+    }
+  }
+
+  // Update the content of the table list item
+  tableItem.innerHTML = `
+    <h3>${tableId}</h3>
+    <ul class="seats">${seatsHtml}</ul>
+  `;
+}
 
 
-
-
-
+fetchAndListenToTables();

@@ -55,6 +55,15 @@
             border: 1px solid black;
             border-radius: 5px;
         }
+        .table-item.reserved {
+            background-color: #ff6868; /* Red for reserved tables */
+            color: white;
+        }
+
+        .table-item.available {
+            background-color: #68ff68; /* Green for available tables */
+            color: black;
+        }
 
     </style>
 </head>
@@ -98,6 +107,13 @@
                             </ul>
                         </li>
                     </ul>
+
+                    <div class="container mt-4">
+                        <h2>Available Tables</h2>
+                        <div id="tablesDisplay" class="row">
+                            <!-- Tables will be displayed here -->
+                        </div>
+                    </div>
         </body>
     </body>
 
