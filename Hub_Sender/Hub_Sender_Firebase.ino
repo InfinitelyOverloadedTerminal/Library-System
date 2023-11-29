@@ -6,12 +6,15 @@
 #include "addons/RTDBHelper.h"
 
 // Insert your network credentials
-#define WIFI_SSID "Sean's Iphone"
-#define WIFI_PASSWORD "12345678"
+#define WIFI_SSID "gabeDevice"
+#define WIFI_PASSWORD "password"
 
 // Insert Firebase project API Key and RTDB URL
-#define API_KEY "AIzaSyBqRdX8pYJ-eozkvlJK5r1IEImX_QezKqk"
-#define DATABASE_URL "https://rfid-scanner-c7160-default-rtdb.firebaseio.com"
+//#define API_KEY "AIzaSyBqRdX8pYJ-eozkvlJK5r1IEImX_QezKqk"
+//#define DATABASE_URL "https://rfid-scanner-c7160-default-rtdb.firebaseio.com"
+
+#define API_KEY "AIzaSyAG2ogN6DiJ8EJbh5sTSwHCPPPIWXod3ZE"
+#define DATABASE_URL "https://library-seating-system-default-rtdb.firebaseio.com/"
 
 // Define Firebase Data object
 FirebaseData fbdo;
@@ -61,30 +64,99 @@ void setup() {
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
 
-  pinMode(Enable_pin, OUTPUT);
-  delay(10); 
-  digitalWrite(Enable_pin, HIGH); 
+
 }
 
 void loop() {
-  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)) {
+  
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 2000 || sendDataPrevMillis == 0)) {
     sendDataPrevMillis = millis();
     
     // Read serial input
     while (Serial.available()) {
-      String incomingData = Serial.readStringUntil('\n');
-      Serial.println("Received Data: " + incomingData);
 
-      // Write to the database
-      String path = "Table " + String(count);
-      if (Firebase.RTDB.set(&fbdo, path, incomingData)) {
+      String incomingData = Serial.readStringUntil('\n');
+
+      Serial.println("Received Data: " + incomingData);
+      /*int buffer = incomingData.length() + 1;
+      char char_array[buffer];
+      incomingData.toCharArray(char_array, buffer);*/
+
+      char seat_num = incomingData[incomingData.length()-2];
+      incomingData[incomingData.length()-1] = '\0';
+      incomingData[incomingData.length()-2] = '\0';
+      //const char* empty = "EMPTY";
+      Serial.println(incomingData.length());
+      Serial.println(seat_num);
+      //Serial.println(char_array);
+      if(incomingData.compareTo("RESERVED") == 0)
+      {
+        String path = "Tables/Table 1/reserved";
+        if (Firebase.RTDB.set(&fbdo, path, true)) 
+        {
         Serial.println("PASSED");
         Serial.println("PATH: " + fbdo.dataPath());
         Serial.println("TYPE: " + fbdo.dataType());
-        count++;
+        }
+        else 
+        {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+        }
+         
+      }
+      else if(incomingData.length() == 10)
+      {
+      // Write to the database
+      
+      //Serial.println(incomingData);
+      //Serial.println(incomingData[incomingData.length()-1]);
+      String path = "Tables/Table 1/Seat";
+      path+=seat_num;
+      
+      //Serial.println(incomingData[incomingData.length()-1]);
+
+      if (Firebase.RTDB.set(&fbdo, path, incomingData)) 
+      {
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
       } else {
         Serial.println("FAILED");
         Serial.println("REASON: " + fbdo.errorReason());
+      }
+      }
+      else if(incomingData.compareTo("EMPTY") == 0)
+      {
+        String path = "Tables/Table 1/Seat";
+        path+=seat_num;
+        if (Firebase.RTDB.set(&fbdo, path, NULL)) {
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+        
+      } else {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+      }
+      }
+      
+      else if(incomingData.compareTo("RELEASE") == 0)
+      {
+        String path = "Tables/Table 1/reserved";
+        if (Firebase.RTDB.set(&fbdo, path, false)) {
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+        
+      } else {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+      }
+      }
+      else
+      {
+        Serial.println("Not working");
       }
     }
   }
