@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set, update, onValue, get, remove } from "firebase/database";
+import { getAuth, signOut } from "firebase/auth";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAG2ogN6DiJ8EJbh5sTSwHCPPPIWXod3ZE",
@@ -113,6 +115,20 @@ function deleteTableSeats(tableId) {
   });
 }
 
+function logoutUser() {
+  const auth = getAuth();
+  signOut(auth).then(() => {
+      window.location.href = '/index.html'; // Redirect on successful logout
+  }).catch((error) => {
+      console.error('Logout failed:', error);
+  });
+}
 
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutBtn = document.getElementById('logoutButton');
+  if (logoutBtn) {
+      logoutBtn.addEventListener('click', logoutUser);
+  }
+});
 
 fetchAndListenToTables();
