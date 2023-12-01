@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     mode: 'development',
-    devtool: 'eval-source-map',
+    devtool: 'eval-source-map',    
     entry: {
         main: './src/js/index.js',  // Assuming this is the main JS for what was previously index.html
         home: './src/js/home.js'    // If you have a separate JS for home.html
@@ -36,6 +36,7 @@ module.exports = {
         ],
     },
     plugins: [
+
         new HtmlWebpackPlugin({
             template: './src/pages/index.html',
             filename: 'index.html',

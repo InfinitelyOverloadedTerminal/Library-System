@@ -6,6 +6,7 @@
 }
 
 body {
+    background: radial-gradient(circle at 50% 50%, #1b2735 0%, #090a0f 100%);
     background-color: #0d0d0d; /* Dark background for terminal look */
     color: #2ecc71; 
     font-family: 'Courier New', Courier, monospace; 
@@ -61,4 +62,9 @@ h1 {
     border-radius: 5px; /* Rounded corners */
     box-shadow: 0px 0px 5px #2ecc71; /* Green box shadow */
     text-align: center; /* Center-align text */
+}
+
+#login-error {
+    color: red;
+    margin-bottom: 10px;
 }

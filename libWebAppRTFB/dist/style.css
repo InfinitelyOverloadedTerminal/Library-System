@@ -1,0 +1,74 @@
+/*!************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/styles/style.css ***!
+  \************************************************************************/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle at 50% 50%, #1b2735 0%, #090a0f 100%);
+    background-color: #0d0d0d; /* Dark background for terminal look */
+    color: #2ecc71; 
+    font-family: 'Courier New', Courier, monospace; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-container {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 5px;
+    text-align: center; 
+    width: 300px;
+}
+
+h1, h2 {
+    margin-bottom: 20px; /* Spacing below headings */
+}
+
+input[type="email"], input[type="password"] {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+    background-color: #222;
+    color: #fff;
+    border-radius: 4px;
+}
+
+button {
+    width: 90%; 
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #555; /* Darker button color */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+button:hover {
+    background-color: #777; /* Lighter color on hover */
+}
+
+h1 {
+    background-color: #000; /* Black background */
+    color: #2ecc71; /* Green text color */
+    font-family: 'Courier New', monospace; /* Monospace font */
+    padding: 10px; /* Padding around the text */
+    border: 2px solid #2ecc71; /* Green border */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0px 0px 5px #2ecc71; /* Green box shadow */
+    text-align: center; /* Center-align text */
+}
+
+#login-error {
+    color: red;
+    margin-bottom: 10px;
+}
+
